@@ -59,4 +59,5 @@
 
 1. รันโปรเจกต์ด้วยคำสั่ง
    ```bash
+   flutter pub get
    flutter run
