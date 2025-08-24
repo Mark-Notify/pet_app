@@ -1,0 +1,467 @@
+import 'package:flutter/material.dart';
+import '../../core/env.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    // โทนสีหลักขาว-ส้ม
+    final orange = cs.primary; // ใช้ seed ของธีม (แนะนำให้ seed เป็นส้ม)
+    final softOrange = Color.lerp(orange, Colors.white, 0.75)!;
+    final bg = Color.lerp(Colors.white, softOrange, 0.90)!;
+
+    return Scaffold(
+      backgroundColor: bg,
+      body: CustomScrollView(
+        slivers: [
+          _CuteSliverAppBar(orange: orange),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Banner น่ารักหัวหน้า
+                  _HeroBanner(orange: orange),
+                  const SizedBox(height: 16),
+
+                  // Title
+                  Row(
+                    children: [
+                      Text(
+                        'เลือกดูสตรีม',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: cs.onBackground.withOpacity(.9),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _CuteDot(color: orange),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // การ์ด 1: สตรีมของเรา (HLS)
+                  _CuteCard(
+                    gradient: LinearGradient(
+                      colors: [Colors.white, softOrange],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    leading: _EmojiCircle(
+                      emoji: '🐾',
+                      bg: Colors.white,
+                      border: orange.withOpacity(.25),
+                    ),
+                    title: 'ดูผ่านสตรีมของเรา (HLS)',
+                    subtitle: 'เล่นด้วย player ในแอป • latency ต่ำ',
+                    badgeText: 'LIVE',
+                    badgeColor: orange,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/live',
+                      arguments: {
+                        'source': 'hls',
+                        'animalId': 'a1',
+                      },
+                    ),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16, color: cs.onSurface.withOpacity(.6)),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // การ์ด 2: TikTok Live
+                  _CuteCard(
+                    gradient: LinearGradient(
+                      colors: [Colors.white, Colors.orange.shade50],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    leading: _EmojiCircle(
+                      emoji: '🎥',
+                      bg: Colors.white,
+                      border: Colors.orange.withOpacity(.25),
+                    ),
+                    title: 'ดูผ่าน TikTok Live',
+                    subtitle: 'เปิดใน WebView ของ TikTok • เดโมไว',
+                    badgeText: 'BETA',
+                    badgeColor: Colors.orange,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/live',
+                      arguments: {
+                        'source': 'tiktok',
+                        'tiktokUser': Env.tiktokUser, // เปลี่ยนใน env ได้
+                        'animalId': 'a1',
+                      },
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.open_in_new, size: 18, color: cs.onSurface.withOpacity(.6)),
+                        const SizedBox(width: 6),
+                        Icon(Icons.arrow_forward_ios, size: 16, color: cs.onSurface.withOpacity(.6)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // แถวหมวดหมู่/ชิป (ตกแต่งความน่ารัก)
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _CuteChip(icon: Icons.pets, text: 'สัตว์ฮิต'),
+                      _CuteChip(icon: Icons.favorite, text: 'ถูกใจฉัน'),
+                      _CuteChip(icon: Icons.timer, text: 'กำลังกินอยู่'),
+                      _CuteChip(icon: Icons.star, text: 'อันดับประจำสัปดาห์'),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // สรุปสั้น ๆ
+                  _InfoHint(
+                    icon: Icons.info_outline,
+                    text: 'ทุกการให้อาหารมีโควตาปลอดภัยตามคำแนะนำของสัตวแพทย์',
+                    color: orange,
+                  ),
+                  const SizedBox(height: 100), // เผื่อพื้นที่ให้ FAB
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      // ปุ่ม Wallet แบบเด่น ๆ
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: _CuteWalletButton(
+        color: orange,
+        onTap: () => Navigator.pushNamed(context, '/wallet'),
+      ),
+    );
+  }
+}
+
+/// -------------------------- Widgets น่ารัก ๆ --------------------------
+
+class _CuteSliverAppBar extends StatelessWidget {
+  const _CuteSliverAppBar({required this.orange});
+  final Color orange;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return SliverAppBar(
+      pinned: true,
+      expandedHeight: 88,
+      backgroundColor: Color.lerp(Colors.white, orange.withOpacity(.08), .5),
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 10),
+        title: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: cs.primary.withOpacity(.15), blurRadius: 8)],
+              ),
+              padding: const EdgeInsets.all(6),
+              child: Text('🐶', style: TextStyle(fontSize: 18)),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'CDH • PetFeed',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: cs.onSurface,
+                letterSpacing: .2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroBanner extends StatelessWidget {
+  const _HeroBanner({required this.orange});
+  final Color orange;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [orange.withOpacity(.12), Colors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: orange.withOpacity(.15)),
+        boxShadow: [BoxShadow(color: orange.withOpacity(.12), blurRadius: 16, offset: const Offset(0, 8))],
+      ),
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        children: [
+          // cute icon block
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: orange.withOpacity(.2)),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: const Text('🥕', style: TextStyle(fontSize: 28)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('ให้อาหารสัตว์แบบไลฟ์',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: cs.onSurface)),
+                const SizedBox(height: 4),
+                Text('กดส่งอาหาร • ส่งของขวัญ • สะสมแต้ม',
+                    style: TextStyle(fontSize: 13, color: cs.onSurface.withOpacity(.7))),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: orange,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: const [
+                Icon(Icons.bolt, size: 16, color: Colors.white),
+                SizedBox(width: 6),
+                Text('Live Now', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CuteCard extends StatelessWidget {
+  const _CuteCard({
+    required this.gradient,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    this.trailing,
+    this.badgeText,
+    this.badgeColor,
+  });
+
+  final Gradient gradient;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  final Widget? trailing;
+  final String? badgeText;
+  final Color? badgeColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(22),
+      onTap: onTap,
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: cs.primary.withOpacity(.08)),
+          boxShadow: [BoxShadow(color: cs.primary.withOpacity(.08), blurRadius: 12, offset: const Offset(0, 6))],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              leading,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (badgeText != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: (badgeColor ?? cs.primary).withOpacity(.12),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Text(
+                            badgeText!,
+                            style: TextStyle(
+                              color: badgeColor ?? cs.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: .3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ]),
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: cs.onSurface.withOpacity(.7),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              trailing ?? const SizedBox.shrink(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmojiCircle extends StatelessWidget {
+  const _EmojiCircle({required this.emoji, required this.bg, required this.border});
+  final String emoji;
+  final Color bg;
+  final Color border;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: bg,
+        shape: BoxShape.circle,
+        border: Border.all(color: border, width: 2),
+      ),
+      alignment: Alignment.center,
+      child: Text(emoji, style: const TextStyle(fontSize: 24)),
+    );
+  }
+}
+
+class _CuteDot extends StatelessWidget {
+  const _CuteDot({required this.color});
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8, height: 8,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+}
+
+class _CuteChip extends StatelessWidget {
+  const _CuteChip({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.primary.withOpacity(.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cs.primary.withOpacity(.15)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 16, color: cs.primary),
+        const SizedBox(width: 6),
+        Text(text, style: TextStyle(color: cs.primary, fontWeight: FontWeight.w700)),
+      ]),
+    );
+    }
+}
+
+class _InfoHint extends StatelessWidget {
+  const _InfoHint({required this.icon, required this.text, required this.color});
+  final IconData icon;
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(.15)),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87))),
+        ],
+      ),
+    );
+  }
+}
+
+class _CuteWalletButton extends StatelessWidget {
+  const _CuteWalletButton({required this.color, required this.onTap});
+  final Color color;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        // เงาน่ารัก ๆ
+        boxShadow: [BoxShadow(color: color.withOpacity(.35), blurRadius: 18, offset: const Offset(0, 8))],
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: ElevatedButton.icon(
+        onPressed: onTap,
+        icon: const Icon(Icons.account_balance_wallet),
+        label: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 12.0),
+          child: Text('Wallet', style: TextStyle(fontWeight: FontWeight.w800)),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        ),
+      ),
+    );
+  }
+}
