@@ -43,7 +43,7 @@ Care, Donate, Hug → สื่อถึงการดูแล, ส่งอ�
 - 🔹 `live/live_screen.dart` : หน้า Live Streaming  
 - 🔹 `live/widgets/feed_button.dart` : ปุ่ม feed สำหรับ Live  
 - 🔹 `wallet/wallet_screen.dart` : หน้า Wallet  
-- 🔹 `profile/animal_profile_screen.dart` : หน้าโปรไฟล์สัตว์
+- 🔹 `profile/profile_screen.dart` : หน้าโปรไฟล์สัตว์
 
 ---
 
